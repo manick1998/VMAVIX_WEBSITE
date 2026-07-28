@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Logo } from "../common/Logo";
-import { ArrowUpRight, CheckCircle2, Send, Mail } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Send, Mail, MessageCircle, Phone } from "lucide-react";
 import confetti from "canvas-confetti";
 import { soundManager } from "../../utils/audio";
-import { NAV_LINKS, CONTACT, SERVICES_DATA } from "../../data/vmavixData";
+import { NAV_LINKS, SERVICES_DATA } from "../../data/vmavixData";
+import { quickWhatsAppUrl, PHONE_E164, PHONE_DISPLAY, EMAIL } from "../../config/contact";
 
 interface FooterProps {
   onOpenProjectModal: () => void;
@@ -30,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenProjectModal, onOpenLegalM
         });
         if (!res.ok) throw new Error("failed");
       } else {
-        window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
+        window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(
           "Newsletter signup"
         )}&body=${encodeURIComponent(`Please add ${email} to the VMAVIX mailing list.`)}`;
       }
@@ -65,11 +66,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenProjectModal, onOpenLegalM
             </p>
 
             <a
-              href={`mailto:${CONTACT.email}`}
+              href={`mailto:${EMAIL}`}
               className="inline-flex items-center gap-2 text-xs font-semibold text-white transition-colors hover:text-brand-orange"
             >
               <Mail className="h-4 w-4 text-brand-orange" aria-hidden="true" />
-              {CONTACT.email}
+              {EMAIL}
             </a>
 
             <div className="pt-2">
@@ -112,7 +113,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenProjectModal, onOpenLegalM
 
               {state === "error" && (
                 <p role="alert" className="mt-2 text-[11px] text-red-400">
-                  Couldn&apos;t subscribe. Email {CONTACT.email} instead.
+                  Couldn&apos;t subscribe. Email {EMAIL} instead.
                 </p>
               )}
             </div>
@@ -163,6 +164,25 @@ export const Footer: React.FC<FooterProps> = ({ onOpenProjectModal, onOpenLegalM
               with next steps.
             </p>
 
+            <a
+              href={quickWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => soundManager.playClick()}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#25D366,#128C7E)] py-3 text-xs font-bold text-white transition-all hover:shadow-[0_8px_24px_-8px_rgba(37,211,102,0.8)]"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              <span>WhatsApp us</span>
+            </a>
+
+            <a
+              href={`tel:${PHONE_E164}`}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/12 bg-white/[0.04] py-3 text-xs font-bold text-white/80 transition-colors hover:text-white"
+            >
+              <Phone className="h-4 w-4 text-brand-cyan" aria-hidden="true" />
+              {PHONE_DISPLAY}
+            </a>
+
             <button
               type="button"
               onClick={() => {
@@ -182,7 +202,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenProjectModal, onOpenLegalM
           <div className="flex flex-wrap items-center justify-center gap-2">
             <span>© {new Date().getFullYear()} VMAVIX. All rights reserved.</span>
             <span className="hidden sm:inline">•</span>
-            <span className="hidden text-gray-400 sm:inline">{CONTACT.tagline}</span>
+            <span className="hidden text-gray-400 sm:inline">{'Design • Develop • Grow'}</span>
           </div>
 
           <div className="flex items-center gap-5">

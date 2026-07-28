@@ -2,7 +2,7 @@ import React from "react";
 import { X, ShieldCheck } from "lucide-react";
 import { soundManager } from "../../utils/audio";
 import { useModalA11y } from "../../hooks/useModalA11y";
-import { CONTACT } from "../../data/vmavixData";
+import { LEGAL_EMAIL } from "../../config/contact";
 
 interface LegalModalProps {
   title: string | null;
@@ -95,8 +95,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({ title, onClose }) => {
           </ul>
           <p className="pt-2">
             Questions? Email{" "}
-            <a href={`mailto:${CONTACT.legalEmail}`} className="text-brand-orange hover:underline">
-              {CONTACT.legalEmail}
+            <a href={`mailto:${LEGAL_EMAIL}`} className="text-brand-orange hover:underline">
+              {LEGAL_EMAIL}
             </a>
             .
           </p>

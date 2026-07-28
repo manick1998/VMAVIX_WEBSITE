@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowUpRight, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowUpRight, Sparkles, ShieldCheck, Zap, MessageCircle, Phone } from 'lucide-react';
+import { quickWhatsAppUrl, PHONE_E164, PHONE_DISPLAY } from '../../config/contact';
 import { soundManager } from '../../utils/audio';
 
 interface CTAProps {
@@ -28,19 +29,40 @@ export const CTA: React.FC<CTAProps> = ({ onOpenProjectModal }) => {
             Tell us what you're building. We take on a limited number of projects at a time so every client gets senior attention.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+          <div className="mb-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <button
+              type="button"
               onClick={() => {
                 soundManager.playClick();
                 onOpenProjectModal();
               }}
               onMouseEnter={() => soundManager.playHover()}
-              className="w-full sm:w-auto px-10 py-5 rounded-full font-extrabold text-base text-white bg-gradient-to-r from-brand-orange via-brand-pink to-brand-cyan hover:shadow-[0_0_50px_rgba(255,94,58,0.7)] transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 group"
+              className="group flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-brand-orange via-brand-pink to-brand-cyan px-10 py-5 text-base font-extrabold text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_50px_rgba(255,94,58,0.7)] sm:w-auto"
             >
               <span>Start your project</span>
-              <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              <ArrowUpRight className="h-5 w-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" aria-hidden="true" />
             </button>
+
+            <a
+              href={quickWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => soundManager.playClick()}
+              onMouseEnter={() => soundManager.playHover()}
+              className="flex w-full items-center justify-center gap-3 rounded-full bg-[linear-gradient(135deg,#25D366,#128C7E)] px-10 py-5 text-base font-extrabold text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_50px_rgba(37,211,102,0.65)] sm:w-auto"
+            >
+              <MessageCircle className="h-5 w-5" aria-hidden="true" />
+              <span>WhatsApp us</span>
+            </a>
           </div>
+
+          <a
+            href={`tel:${PHONE_E164}`}
+            className="mb-12 inline-flex items-center gap-2 font-mono text-sm text-gray-400 transition-colors hover:text-white"
+          >
+            <Phone className="h-4 w-4 text-brand-cyan" aria-hidden="true" />
+            {PHONE_DISPLAY}
+          </a>
 
           {/* Key commitments */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto pt-8 border-t border-white/10 text-xs font-mono text-gray-300">

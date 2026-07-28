@@ -36,12 +36,25 @@ npm run dev        # http://localhost:5173
 
 ---
 
-## Connecting the enquiry form
+## Contact & WhatsApp
 
-The form works out of the box: with no configuration it opens the visitor's
-mail client with the enquiry pre-filled, so **a lead is never lost**.
+All contact details live in **`src/config/contact.ts`** — change the number
+or email in that one file and it updates everywhere (hero, dock, footer,
+floating button, form, JSON-LD).
 
-To POST to a real endpoint instead, copy `.env.example` to `.env` and set:
+```ts
+export const WHATSAPP_NUMBER = "919361099051"; // digits only, with country code
+export const PHONE_DISPLAY   = "+91 93610 99051";
+```
+
+**The enquiry form submits through WhatsApp.** On send it opens `wa.me` with
+a formatted message containing the visitor's name, email, company, scope,
+budget, timeline and brief — so the lead lands directly in your chat.
+
+Optionally also POST a copy to a CRM by setting `VITE_CONTACT_ENDPOINT`.
+WhatsApp delivery does not depend on it.
+
+To configure, copy `.env.example` to `.env` and set:
 
 ```bash
 VITE_CONTACT_ENDPOINT=https://formspree.io/f/your-id
@@ -60,6 +73,25 @@ your own API route. The payload shape is:
 ```
 
 ---
+
+## Mobile experience
+
+The mobile site is a **separate build**, not a reflowed desktop layout.
+`useIsMobile()` swaps the entire component tree below 1024px:
+
+| | Desktop | Mobile |
+|---|---|---|
+| Nav | top bar | floating glass dock with raised CTA |
+| Hero | wide split | full-viewport, animated logo reveal |
+| Services | 3-col grid | large tappable blocks + category rail |
+| Portfolio | grid | snap-scrolling swipe cards |
+| Testimonials | slider | swipe carousel |
+| Modals | centred dialog | iOS-style bottom sheet with grab handle |
+| Contact | footer links | sticky WhatsApp / Call / Quote cluster |
+
+Every mobile section uses a different scroll-reveal (`fade-up`, `blur-in`,
+`curtain`, `rotate-in`, `slide-left/right`, `scale-in`, `stagger`) so no two
+sections enter the same way.
 
 ## Project structure
 

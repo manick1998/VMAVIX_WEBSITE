@@ -545,8 +545,3 @@ export const TIMELINE_OPTIONS = [
   'Flexible',
 ] as const;
 
-export const CONTACT = {
-  email: 'hello@vmavix.com',
-  legalEmail: 'legal@vmavix.com',
-  tagline: 'Design • Develop • Grow',
-} as const;
