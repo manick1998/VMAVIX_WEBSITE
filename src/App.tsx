@@ -39,6 +39,7 @@ import { MobileCTA } from "./components/mobile/MobileCTA";
 import { MobileFooter } from "./components/mobile/MobileFooter";
 import { MobileServiceSheet } from "./components/mobile/MobileServiceSheet";
 import { MobileProjectSheet } from "./components/mobile/MobileProjectSheet";
+import { MobileIntro } from "./components/mobile/MobileIntro";
 
 export function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -67,7 +68,14 @@ export function App() {
 
   return (
     <div className="relative min-h-screen bg-ink text-white selection:bg-brand-orange/30">
-      {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
+      {/* Desktop plays the 16:9 film; mobile gets a portrait-native intro
+          rendered in canvas + CSS, so there is no letterboxing. */}
+      {isLoading &&
+        (isMobile ? (
+          <MobileIntro onComplete={() => setIsLoading(false)} />
+        ) : (
+          <LoadingScreen onComplete={() => setIsLoading(false)} />
+        ))}
 
       <a
         href="#main"

@@ -7,7 +7,16 @@ import { useEffect, useState } from "react";
  * consistent, and listens to the media query rather than resize events.
  */
 export function useIsMobile(breakpoint = 1024): boolean {
-  const [isMobile, setIsMobile] = useState(false);
+  /**
+   * Resolved synchronously on first render. This app is client-rendered
+   * only, so there is no hydration mismatch to worry about — and reading
+   * it up front matters: deferring to an effect made phones paint one
+   * frame of the desktop layout (and the desktop intro) before switching.
+   */
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(`(max-width: ${breakpoint - 1}px)`).matches;
+  });
 
   useEffect(() => {
     const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
