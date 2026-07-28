@@ -1,216 +1,201 @@
-import React, { useState, useEffect } from 'react';
-import { Logo } from '../common/Logo';
-import { ArrowUpRight, CheckCircle2, Send } from 'lucide-react';
-import confetti from 'canvas-confetti';
-import { soundManager } from '../../utils/audio';
+import React, { useState } from "react";
+import { Logo } from "../common/Logo";
+import { ArrowUpRight, CheckCircle2, Send, Mail } from "lucide-react";
+import confetti from "canvas-confetti";
+import { soundManager } from "../../utils/audio";
+import { NAV_LINKS, CONTACT, SERVICES_DATA } from "../../data/vmavixData";
 
 interface FooterProps {
   onOpenProjectModal: () => void;
   onOpenLegalModal: (title: string) => void;
 }
 
+const NEWSLETTER_ENDPOINT = import.meta.env.VITE_NEWSLETTER_ENDPOINT as string | undefined;
+
 export const Footer: React.FC<FooterProps> = ({ onOpenProjectModal, onOpenLegalModal }) => {
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-  const [times, setTimes] = useState({
-    sf: '',
-    london: '',
-    dubai: '',
-    tokyo: ''
-  });
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
 
-  useEffect(() => {
-    const updateClocks = () => {
-      const now = new Date();
-      setTimes({
-        sf: now.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: '2-digit', minute: '2-digit' }),
-        london: now.toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit' }),
-        dubai: now.toLocaleTimeString('en-US', { timeZone: 'Asia/Dubai', hour: '2-digit', minute: '2-digit' }),
-        tokyo: now.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' })
-      });
-    };
-
-    updateClocks();
-    const interval = setInterval(updateClocks, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newsletterEmail) return;
-    soundManager.playSuccess();
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.8 }
-    });
-    setSubscribed(true);
-    setNewsletterEmail('');
+    if (!email) return;
+
+    setState("sending");
+    try {
+      if (NEWSLETTER_ENDPOINT) {
+        const res = await fetch(NEWSLETTER_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ email, source: "vmavix.com footer" }),
+        });
+        if (!res.ok) throw new Error("failed");
+      } else {
+        window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
+          "Newsletter signup"
+        )}&body=${encodeURIComponent(`Please add ${email} to the VMAVIX mailing list.`)}`;
+      }
+
+      soundManager.playSuccess();
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        confetti({ particleCount: 70, spread: 70, origin: { y: 0.85 } });
+      }
+      setState("done");
+      setEmail("");
+    } catch {
+      setState("error");
+    }
   };
 
+  const topServices = SERVICES_DATA.slice(0, 8);
+
   return (
-    <footer className="bg-[#030305] pt-20 pb-12 border-t border-white/10 relative overflow-hidden text-gray-400 font-light text-xs sm:text-sm">
-      {/* Glow Mesh */}
-      <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-gradient-to-tl from-orange-600/10 via-pink-600/10 to-transparent blur-[140px] pointer-events-none" />
+    <footer className="relative overflow-hidden border-t border-white/10 bg-[#030305] pb-10 pt-20 text-xs font-light text-gray-400 sm:text-sm">
+      <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[min(95vw,600px)] bg-gradient-to-tl from-brand-orange/10 via-brand-pink/10 to-transparent blur-[140px]" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
-        {/* Top Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-white/10">
-          {/* Brand Column */}
-          <div className="lg:col-span-4 space-y-6">
-            <Logo size="lg" showTagline={true} />
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
+        <div className="grid grid-cols-1 gap-10 border-b border-white/10 pb-14 sm:grid-cols-2 lg:grid-cols-12 lg:gap-12">
+          {/* Brand */}
+          <div className="space-y-6 sm:col-span-2 lg:col-span-4">
+            <Logo size="lg" showTagline />
 
-            <p className="text-gray-400 text-xs sm:text-sm leading-relaxed max-w-sm">
-              VMAVIX is an award-winning digital technology and brand engineering studio building luxury web experiences, software products, and performance growth engines.
+            <p className="max-w-sm text-xs leading-relaxed text-gray-400 sm:text-sm">
+              VMAVIX is a digital design, engineering and brand studio. We build fast,
+              high-converting websites, e-commerce platforms, brand identities and AI-powered
+              products.
             </p>
 
-            {/* Newsletter Form */}
+            <a
+              href={`mailto:${CONTACT.email}`}
+              className="inline-flex items-center gap-2 text-xs font-semibold text-white transition-colors hover:text-brand-orange"
+            >
+              <Mail className="h-4 w-4 text-brand-orange" aria-hidden="true" />
+              {CONTACT.email}
+            </a>
+
             <div className="pt-2">
-              <span className="font-mono text-[11px] text-gray-300 font-bold uppercase tracking-wider block mb-2">
-                JOIN THE VMAVIX INTELLIGENCE DISPATCH
+              <span className="mb-2 block font-mono text-[11px] font-bold uppercase tracking-wider text-gray-300">
+                Get occasional build notes
               </span>
-              {subscribed ? (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" /> You're subscribed to elite digital insights.
+
+              {state === "done" ? (
+                <div
+                  role="status"
+                  className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400"
+                >
+                  <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> You&apos;re on the list.
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="flex gap-2">
+                  <label htmlFor="footer-email" className="sr-only">
+                    Email address
+                  </label>
                   <input
+                    id="footer-email"
                     type="email"
                     required
-                    value={newsletterEmail}
-                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                    placeholder="Enter your work email..."
-                    className="bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 flex-1"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    className="flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:border-brand-orange focus:outline-none"
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold hover:shadow-lg transition-all"
+                    disabled={state === "sending"}
+                    aria-label="Subscribe"
+                    className="rounded-xl bg-gradient-to-r from-brand-orange to-brand-pink px-4 py-2.5 font-bold text-white transition-all hover:shadow-lg disabled:opacity-60"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </form>
+              )}
+
+              {state === "error" && (
+                <p role="alert" className="mt-2 text-[11px] text-red-400">
+                  Couldn&apos;t subscribe. Email {CONTACT.email} instead.
+                </p>
               )}
             </div>
           </div>
 
-          {/* Quick Links Column */}
-          <div className="lg:col-span-2 space-y-3">
-            <span className="font-mono text-xs font-bold text-white uppercase tracking-wider block mb-4">
-              NAVIGATION
-            </span>
-            {[
-              { label: 'About VMAVIX', href: '#about' },
-              { label: 'Capabilities', href: '#services' },
-              { label: 'Why VMAVIX', href: '#why-us' },
-              { label: 'Portfolio', href: '#portfolio' },
-              { label: 'Process', href: '#process' },
-              { label: 'Tech Stack', href: '#tech-stack' },
-              { label: 'Pricing', href: '#pricing' },
-              { label: 'FAQ', href: '#faq' }
-            ].map((link) => (
+          {/* Navigation */}
+          <nav aria-label="Footer navigation" className="space-y-3 lg:col-span-2">
+            <h2 className="mb-4 block font-mono text-xs font-bold uppercase tracking-wider text-white">
+              Navigate
+            </h2>
+            {NAV_LINKS.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={() => soundManager.playClick()}
-                className="block text-gray-400 hover:text-white transition-colors"
+                className="block text-gray-400 transition-colors hover:text-white"
               >
                 {link.label}
               </a>
             ))}
-          </div>
+          </nav>
 
-          {/* Services Column */}
-          <div className="lg:col-span-3 space-y-3">
-            <span className="font-mono text-xs font-bold text-white uppercase tracking-wider block mb-4">
-              SERVICES
-            </span>
-            {[
-              'Website Design & UI/UX',
-              'Website Engineering',
-              'E-Commerce Platforms',
-              'Business & Enterprise Web',
-              'Logo & Graphic Design',
-              'Master Brand Identity',
-              'Search Engine Optimization',
-              'AI Solutions & Automation'
-            ].map((service) => (
+          {/* Services */}
+          <div className="space-y-3 lg:col-span-3">
+            <h2 className="mb-4 block font-mono text-xs font-bold uppercase tracking-wider text-white">
+              Services
+            </h2>
+            {topServices.map((s) => (
               <a
-                key={service}
+                key={s.id}
                 href="#services"
                 onClick={() => soundManager.playClick()}
-                className="block text-gray-400 hover:text-white transition-colors text-xs"
+                className="block text-xs text-gray-400 transition-colors hover:text-white"
               >
-                {service}
+                {s.title}
               </a>
             ))}
           </div>
 
-          {/* Global Offices & Live Time Column */}
-          <div className="lg:col-span-3 space-y-4">
-            <span className="font-mono text-xs font-bold text-white uppercase tracking-wider block mb-4">
-              GLOBAL PRESENCE
-            </span>
+          {/* Contact */}
+          <div className="space-y-4 lg:col-span-3">
+            <h2 className="mb-4 block font-mono text-xs font-bold uppercase tracking-wider text-white">
+              Start here
+            </h2>
 
-            <div className="space-y-3 font-mono text-xs">
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
-                <span className="text-gray-300">San Francisco, USA</span>
-                <span className="text-cyan-400">{times.sf || '09:00 AM'}</span>
-              </div>
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
-                <span className="text-gray-300">London, UK</span>
-                <span className="text-cyan-400">{times.london || '17:00 PM'}</span>
-              </div>
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
-                <span className="text-gray-300">Dubai, UAE</span>
-                <span className="text-cyan-400">{times.dubai || '20:00 PM'}</span>
-              </div>
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
-                <span className="text-gray-300">Tokyo, Japan</span>
-                <span className="text-cyan-400">{times.tokyo || '02:00 AM'}</span>
-              </div>
-            </div>
+            <p className="text-xs leading-relaxed text-gray-400">
+              Tell us what you&apos;re building and we&apos;ll come back within one business day
+              with next steps.
+            </p>
 
             <button
+              type="button"
               onClick={() => {
                 soundManager.playClick();
                 onOpenProjectModal();
               }}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/40 text-orange-400 font-bold text-xs flex items-center justify-center gap-2 hover:bg-orange-500 hover:text-white transition-all"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-brand-orange/40 bg-gradient-to-r from-brand-orange/20 to-brand-pink/20 py-3 text-xs font-bold text-brand-orange transition-all hover:bg-brand-orange hover:text-white"
             >
-              <span>Schedule Direct Consultation</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <span>Request a proposal</span>
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
 
-        {/* Bottom Legal & Copyright Bar */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-mono">
-          <div className="flex items-center gap-2">
-            <span>© {new Date().getFullYear()} VMAVIX LLC. All Rights Reserved.</span>
+        {/* Bottom bar */}
+        <div className="flex flex-col items-center justify-between gap-4 pt-8 font-mono text-xs text-gray-500 md:flex-row">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span>© {new Date().getFullYear()} VMAVIX. All rights reserved.</span>
             <span className="hidden sm:inline">•</span>
-            <span className="hidden sm:inline text-gray-400">Design • Develop • Grow</span>
+            <span className="hidden text-gray-400 sm:inline">{CONTACT.tagline}</span>
           </div>
 
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => onOpenLegalModal('Privacy Policy')}
-              className="hover:text-white transition-colors"
-            >
-              Privacy Policy
-            </button>
-            <button
-              onClick={() => onOpenLegalModal('Terms of Service')}
-              className="hover:text-white transition-colors"
-            >
-              Terms of Service
-            </button>
-            <button
-              onClick={() => onOpenLegalModal('Security & SOC-2')}
-              className="hover:text-white transition-colors"
-            >
-              Security
-            </button>
+          <div className="flex items-center gap-5">
+            {["Privacy Policy", "Terms of Service", "Security"].map((doc) => (
+              <button
+                key={doc}
+                type="button"
+                onClick={() => onOpenLegalModal(doc)}
+                className="transition-colors hover:text-white"
+              >
+                {doc}
+              </button>
+            ))}
           </div>
         </div>
       </div>

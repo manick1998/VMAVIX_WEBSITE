@@ -1,69 +1,110 @@
-import React, { useEffect, useState } from 'react';
-import { Logo } from './Logo';
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface LoadingScreenProps {
   onComplete: () => void;
 }
 
+const INTRO_SRC = `${import.meta.env.BASE_URL}media/vmavix-intro.mp4`;
+const LOGO_SRC = `${import.meta.env.BASE_URL}brand/mavixlogo.webp`;
+
+/**
+ * Cinematic intro: plays the VMAVIX animated logo video, then fades into the site.
+ *
+ * Safeguards, because autoplay is not guaranteed:
+ *  - muted + playsInline so mobile browsers allow autoplay
+ *  - falls back to a static logo if the video errors or can't play
+ *  - a hard 11s watchdog guarantees the site always appears
+ *  - honours prefers-reduced-motion by skipping straight through
+ *  - Skip button, always available
+ */
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
-  const [progress, setProgress] = useState(0);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isFading, setIsFading] = useState(false);
+  const [useFallback, setUseFallback] = useState(false);
+  const finished = useRef(false);
+
+  const finish = useCallback(() => {
+    if (finished.current) return;
+    finished.current = true;
+    setIsFading(true);
+    window.setTimeout(onComplete, 700);
+  }, [onComplete]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setTimeout(() => {
-            setIsFading(true);
-            setTimeout(onComplete, 800);
-          }, 300);
-          return 100;
-        }
-        const increment = Math.floor(Math.random() * 12) + 3;
-        return Math.min(prev + increment, 100);
-      });
-    }, 60);
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) {
+      const t = window.setTimeout(finish, 600);
+      return () => window.clearTimeout(t);
+    }
 
-    return () => clearInterval(timer);
-  }, [onComplete]);
+    const video = videoRef.current;
+    if (video) {
+      const attempt = video.play();
+      if (attempt && typeof attempt.catch === "function") {
+        attempt.catch(() => setUseFallback(true));
+      }
+    }
+
+    // Watchdog: never trap the user on the splash.
+    const watchdog = window.setTimeout(finish, 11000);
+    return () => window.clearTimeout(watchdog);
+  }, [finish]);
+
+  // Fallback path auto-advances after a short beat.
+  useEffect(() => {
+    if (!useFallback) return;
+    const t = window.setTimeout(finish, 2200);
+    return () => window.clearTimeout(t);
+  }, [useFallback, finish]);
 
   return (
     <div
-      className={`fixed inset-0 z-[99999] bg-[#050505] flex flex-col items-center justify-center transition-all duration-700 ease-in-out ${
-        isFading ? 'opacity-0 pointer-events-none scale-105 blur-md' : 'opacity-100'
+      role="status"
+      aria-live="polite"
+      aria-label="VMAVIX intro loading"
+      className={`fixed inset-0 z-[99999] bg-ink flex flex-col items-center justify-center overflow-hidden transition-opacity duration-700 ease-out ${
+        isFading ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      {/* Background Aurora Glow */}
-      <div className="absolute w-[500px] h-[500px] bg-gradient-to-tr from-orange-600/30 via-pink-600/20 to-cyan-500/20 rounded-full blur-[120px] animate-pulse-glow pointer-events-none" />
-
-      {/* Main Loader Content */}
-      <div className="relative z-10 flex flex-col items-center max-w-md w-full px-6 text-center">
-        <Logo size="xl" showTagline={false} animated={true} className="mb-8 scale-110" />
-
-        <p className="font-syne text-xl text-gray-300 font-medium mb-8 tracking-wide">
-          Crafting Digital Excellence
-        </p>
-
-        {/* Progress Bar Container */}
-        <div className="w-full bg-white/5 border border-white/10 rounded-full p-1 backdrop-blur-md mb-4 relative overflow-hidden shadow-[0_0_20px_rgba(255,94,58,0.2)]">
-          <div
-            className="h-2 rounded-full bg-gradient-to-r from-orange-500 via-pink-500 to-cyan-400 transition-all duration-200 ease-out shadow-[0_0_12px_#00F2FE]"
-            style={{ width: `${progress}%` }}
+      {!useFallback ? (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 h-full w-full object-cover"
+          src={INTRO_SRC}
+          muted
+          autoPlay
+          playsInline
+          preload="auto"
+          onEnded={finish}
+          onError={() => setUseFallback(true)}
+          onStalled={() => setUseFallback(true)}
+        />
+      ) : (
+        <div className="relative z-10 flex flex-col items-center px-6 text-center animate-fade-in">
+          <div className="absolute h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-brand-orange/25 via-brand-pink/20 to-brand-cyan/20 blur-[120px]" />
+          <img
+            src={LOGO_SRC}
+            alt="VMAVIX"
+            width={420}
+            height={223}
+            className="relative w-[min(78vw,420px)] drop-shadow-[0_0_45px_rgba(255,94,58,0.35)]"
           />
+          <p className="relative mt-6 font-mono text-[11px] uppercase tracking-[0.35em] text-white/60">
+            Design • Develop • Grow
+          </p>
         </div>
+      )}
 
-        {/* Percentage Counter & Status */}
-        <div className="w-full flex items-center justify-between font-mono text-xs tracking-widest text-gray-400 uppercase">
-          <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            INITIALIZING
-          </span>
-          <span className="text-white font-bold text-sm tracking-normal font-mono">
-            {progress}%
-          </span>
-        </div>
-      </div>
+      {/* Cinematic letterbox + vignette */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/60 via-transparent to-ink/80" />
+
+      <button
+        type="button"
+        onClick={finish}
+        className="absolute bottom-8 right-6 z-20 rounded-full border border-white/20 bg-black/40 px-5 py-2.5 font-mono text-[11px] uppercase tracking-widest text-white/70 backdrop-blur-md transition-colors hover:border-white/50 hover:text-white sm:bottom-10 sm:right-10"
+      >
+        Skip intro
+      </button>
     </div>
   );
 };

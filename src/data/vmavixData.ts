@@ -1,4 +1,11 @@
-import { ServiceItem, ProjectItem, ProcessStep, TechItem, Testimonial, FAQItem, PricingPlan, IndustryItem } from '../types';
+import type {
+  ServiceItem,
+  ProjectItem,
+  TechItem,
+  Testimonial,
+  FAQItem,
+  IndustryItem,
+} from '../types';
 
 export const SERVICES_DATA: ServiceItem[] = [
   {
@@ -45,7 +52,7 @@ export const SERVICES_DATA: ServiceItem[] = [
     fullDesc: 'We replace outdated corporate portals with high-impact brand hubs that establish authority, generate enterprise leads, and captivate stakeholders worldwide.',
     category: 'web',
     icon: 'Building2',
-    features: ['Enterprise Lead Engines', 'Multi-Language Support', 'Role-Based CMS Access', 'SOC-2 Compliant Security'],
+    features: ['Enterprise Lead Engines', 'Multi-Language Support', 'Role-Based CMS Access', 'Hardened Security Practices'],
     deliverables: ['Enterprise Web Portal', 'Lead Management Setup', 'Content Strategy Matrix', 'Analytics Dashboard'],
     typicalTimeline: '3-5 Weeks',
     expectedRoi: '3.4x Enterprise Inquiries'
@@ -286,72 +293,6 @@ export const PORTFOLIO_DATA: ProjectItem[] = [
   }
 ];
 
-export const PROCESS_STEPS: ProcessStep[] = [
-  {
-    stepNumber: '01',
-    title: 'Discovery & Vision',
-    tagline: 'Deep Market Unpacking',
-    description: 'We audit your brand, analyze competitors, uncover customer psychological triggers, and define key technical milestones.',
-    deliverables: ['Brand Audit Report', 'Competitor Benchmark', 'Project Blueprint'],
-    duration: 'Week 1',
-    icon: 'Search'
-  },
-  {
-    stepNumber: '02',
-    title: 'Strategy & Architecture',
-    tagline: 'Blueprinting Success',
-    description: 'Engineering the user flow, information architecture, wireframes, tech stack selection, and conversion funnels.',
-    deliverables: ['UX Wireframes', 'Tech Architecture Map', 'Conversion Strategy'],
-    duration: 'Week 1 - 2',
-    icon: 'Compass'
-  },
-  {
-    stepNumber: '03',
-    title: 'Luxury UI/UX Design',
-    tagline: 'Crafting Visual Dominance',
-    description: 'Building world-class Figma prototypes, dynamic motion systems, interactive 3D assets, and sleek typography grids.',
-    deliverables: ['Interactive Figma Prototype', 'Design System', '3D Assets'],
-    duration: 'Week 2 - 4',
-    icon: 'Palette'
-  },
-  {
-    stepNumber: '04',
-    title: 'Precision Engineering',
-    tagline: 'Flawless Code Execution',
-    description: 'Transforming designs into hyper-fast, clean, scalable React & Next.js applications with smooth 60 FPS animations.',
-    deliverables: ['Production Frontend Code', 'Backend & API Systems', 'Headless CMS'],
-    duration: 'Week 3 - 6',
-    icon: 'Code2'
-  },
-  {
-    stepNumber: '05',
-    title: 'Testing & Optimization',
-    tagline: 'Zero-Defect Standard',
-    description: 'Rigorous cross-device testing, Lighthouse speed tuning, security vulnerability scans, and SEO audit compliance.',
-    deliverables: ['Lighthouse 95+ Certification', 'Security Audit Report', 'QA Test Suite'],
-    duration: 'Week 5 - 7',
-    icon: 'CheckCircle2'
-  },
-  {
-    stepNumber: '06',
-    title: 'Launch & Celebration',
-    tagline: 'Global Go-Live',
-    description: 'Seamless DNS migration, SSL security setup, CDN deployment, and launch strategy execution with zero downtime.',
-    deliverables: ['Live Production Server', 'DNS/CDN Config', 'Post-Launch Monitor'],
-    duration: 'Launch Day',
-    icon: 'Rocket'
-  },
-  {
-    stepNumber: '07',
-    title: 'Growth & Scaling',
-    tagline: 'Continuous Domination',
-    description: 'Ongoing performance marketing, technical upgrades, SEO content sprints, and CRO experimentation to expand revenue.',
-    deliverables: ['Monthly Optimization', 'SEO Campaign', 'Growth Analytics'],
-    duration: 'Continuous',
-    icon: 'TrendingUp'
-  }
-];
-
 export const TECH_STACK: TechItem[] = [
   { id: 'html', name: 'HTML5', category: 'frontend', iconName: 'FileCode', experienceYears: '10+', usageDescription: 'Semantic, accessible DOM structure optimized for web crawlers.', perfScore: 100 },
   { id: 'css', name: 'CSS3 / Tailwind', category: 'frontend', iconName: 'Palette', experienceYears: '10+', usageDescription: 'Custom aurora styling, GPU hardware acceleration, and glassmorphism.', perfScore: 99 },
@@ -362,7 +303,7 @@ export const TECH_STACK: TechItem[] = [
   { id: 'python', name: 'Python', category: 'backend', iconName: 'Terminal', experienceYears: '7+', usageDescription: 'AI model inference, data pipelines, PyTorch, and FastAPI endpoints.', perfScore: 98 },
   { id: 'php', name: 'PHP 8+', category: 'backend', iconName: 'Layers', experienceYears: '9+', usageDescription: 'Robust enterprise backend architecture and custom CMS integrations.', perfScore: 94 },
   { id: 'laravel', name: 'Laravel', category: 'backend', iconName: 'Box', experienceYears: '7+', usageDescription: 'Elegant MVC backend framework for complex web apps & APIs.', perfScore: 96 },
-  { id: 'wordpress', name: 'WordPress', category: 'backend', iconName: 'Layout', experienceYears: '10+', usageDescription: 'Custom headless headless WP setups and bespoke Gutenberg blocks.', perfScore: 92 },
+  { id: 'wordpress', name: 'WordPress', category: 'backend', iconName: 'Layout', experienceYears: '10+', usageDescription: 'Custom headless WP setups and bespoke Gutenberg blocks.', perfScore: 92 },
   { id: 'figma', name: 'Figma', category: 'design', iconName: 'Figma', experienceYears: '8+', usageDescription: 'Ultra-refined design systems, vector auto-layouts, and prototyping.', perfScore: 100 },
   { id: 'aws', name: 'AWS Cloud', category: 'cloud-ai', iconName: 'Cloud', experienceYears: '8+', usageDescription: 'Global S3 CDN, Lambda serverless, CloudFront, and ECS clusters.', perfScore: 99 },
   { id: 'cloud', name: 'Vercel & Cloudflare', category: 'cloud-ai', iconName: 'Zap', experienceYears: '7+', usageDescription: 'Edge network deployment with zero-latency global CDN edge caching.', perfScore: 100 },
@@ -418,71 +359,11 @@ export const TESTIMONIALS: Testimonial[] = [
   }
 ];
 
-export const PRICING_PLANS: PricingPlan[] = [
-  {
-    id: 'starter',
-    name: 'Dominance Launch',
-    tagline: 'For ambitious high-growth startups requiring an immediate high-end presence.',
-    price: '$7,500',
-    period: 'one-time',
-    bestFor: 'Startups & Mid-Market Flagships',
-    deliveryTime: '2-3 Weeks',
-    features: [
-      'Custom Bespoke Design (No Templates)',
-      'Up to 8 High-Impact Web Pages',
-      'React / Next.js Fast Engineering',
-      'Cinematic Aurora & Motion FX',
-      'Full Mobile Responsive Architecture',
-      'Technical SEO & Speed Tuning (95+ score)',
-      'Content Management System (CMS)',
-      '30 Days Post-Launch Concierge Support'
-    ]
-  },
-  {
-    id: 'enterprise',
-    name: 'Market Leader',
-    tagline: 'Full luxury digital ecosystem built to monopolize your industry.',
-    price: '$18,500',
-    period: 'one-time',
-    popular: true,
-    bestFor: 'Scale-Ups & Luxury Brands',
-    deliveryTime: '4-6 Weeks',
-    features: [
-      'Everything in Dominance Launch',
-      'Up to 20 Custom Engineered Pages',
-      '3D Interactive WebGL Elements',
-      'Custom AI Chatbot or LLM Integration',
-      'Advanced Headless E-Commerce / Custom Portal',
-      '100+ Page Master Brand Identity Kit',
-      'Full SEO & Performance Marketing Setup',
-      '60 Days Dedicated Engineering Team'
-    ]
-  },
-  {
-    id: 'custom-vision',
-    name: 'Custom Visionary',
-    tagline: 'Tailored enterprise software, AI agents, and global digital transformations.',
-    price: '$35,000+',
-    period: 'bespoke',
-    bestFor: 'Global Enterprises & Fortune 500',
-    deliveryTime: 'Custom Sprint Timeline',
-    features: [
-      'Bespoke Enterprise Web & Mobile Software',
-      'Custom Fine-Tuned AI Agents & Pipelines',
-      'Unlimited Pages & Web Systems',
-      'Global Multi-Region CDN & SOC-2 Security',
-      'Dedicated Creative Director & Lead Engineers',
-      'Programmatic SEO & Paid Growth Scaling',
-      '24/7 VIP SLA Technical Support'
-    ]
-  }
-];
-
 export const FAQ_ITEMS: FAQItem[] = [
   {
     id: 'faq-1',
     question: 'Why choose VMAVIX over a traditional agency or template website?',
-    answer: 'Traditional agencies use bloated templates, slow WordPress themes, and junior freelancers. VMAVIX operates as an elite digital studio. Every line of code is hand-crafted, every pixel is engineered for luxury, and every animation runs at 60 FPS. We build digital assets that double conversions and elevate brand valuation.',
+    answer: 'Templates constrain you to someone else\'s layout and usually ship with unused code that slows the site down. VMAVIX builds bespoke: every component is written for your brand and your conversion path, tuned for smooth 60 FPS motion and fast load times on real devices.',
     category: 'General'
   },
   {
@@ -494,7 +375,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     id: 'faq-3',
     question: 'Will our website score high on Google PageSpeed / Lighthouse?',
-    answer: 'Yes. We guarantee a 95+ score on mobile and desktop performance, accessibility, SEO, and best practices. Ultra-fast speeds mean higher Google search rankings and dramatically lower bounce rates.',
+    answer: 'Yes. We build to a 95+ target on mobile and desktop for performance, accessibility, SEO and best practices, and we share the Lighthouse report before launch. Ultra-fast speeds mean higher Google search rankings and dramatically lower bounce rates.',
     category: 'Technology & AI'
   },
   {
@@ -575,8 +456,97 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
 ];
 
 export const STATS_DATA = [
-  { value: '$120M+', label: 'Client Revenue Generated', subtext: 'Verified ROI across portfolio' },
-  { value: '99.8%', label: 'Client Retention Rate', subtext: 'Long-term partnership satisfaction' },
-  { value: '45+', label: 'Design & Tech Awards', subtext: 'Awwwards, FWA, CSS Design' },
-  { value: '<12ms', label: 'Global CDN Latency', subtext: 'Sub-second web loading worldwide' }
+  { value: '14', label: 'Specialist Services', subtext: 'Design, engineering, growth and AI' },
+  { value: '95+', label: 'Lighthouse Target', subtext: 'Performance, SEO and best practices' },
+  { value: '2-6', label: 'Week Delivery Sprints', subtext: 'Weekly live staging previews' },
+  { value: '24/7', label: 'Support Availability', subtext: 'Direct line to your lead engineer' },
 ];
+
+/**
+ * Section ids in DOM order. Single source of truth for the navbar,
+ * the footer links and the scroll-spy hook so they can never drift apart.
+ */
+export const SECTION_IDS = [
+  'hero',
+  'about',
+  'services',
+  'why-us',
+  'portfolio',
+  'tech-stack',
+  'industries',
+  'testimonials',
+  'faq',
+] as const;
+
+export const NAV_LINKS = [
+  { label: 'About', href: '#about' },
+  { label: 'Services', href: '#services' },
+  { label: 'Why Us', href: '#why-us' },
+  { label: 'Work', href: '#portfolio' },
+  { label: 'Stack', href: '#tech-stack' },
+  { label: 'Industries', href: '#industries' },
+  { label: 'Reviews', href: '#testimonials' },
+  { label: 'FAQ', href: '#faq' },
+] as const;
+
+/**
+ * The canonical list of scope options used by the enquiry form.
+ * SERVICES_DATA.title values map onto these via `serviceToGoal`, which is
+ * what makes "Request <service> proposal" pre-tick the right box.
+ */
+export const PROJECT_GOALS = [
+  'Website Design & UI/UX',
+  'Website Development',
+  'E-Commerce Platform',
+  'Business & Enterprise Website',
+  'Logo & Graphic Design',
+  'Brand Identity & Strategy',
+  'SEO & Organic Growth',
+  'Digital Marketing & Paid Ads',
+  'AI Solutions & Automation',
+] as const;
+
+export type ProjectGoal = (typeof PROJECT_GOALS)[number];
+
+/** Maps every service id in SERVICES_DATA to a valid PROJECT_GOALS entry. */
+export const SERVICE_ID_TO_GOAL: Record<string, ProjectGoal> = {
+  'website-design': 'Website Design & UI/UX',
+  'website-development': 'Website Development',
+  'e-commerce': 'E-Commerce Platform',
+  'business-websites': 'Business & Enterprise Website',
+  'graphic-design': 'Logo & Graphic Design',
+  'logo-design': 'Logo & Graphic Design',
+  'brand-identity': 'Brand Identity & Strategy',
+  'brand-strategy': 'Brand Identity & Strategy',
+  seo: 'SEO & Organic Growth',
+  'digital-marketing': 'Digital Marketing & Paid Ads',
+  'google-ads': 'Digital Marketing & Paid Ads',
+  'social-media-marketing': 'Digital Marketing & Paid Ads',
+  'performance-marketing': 'Digital Marketing & Paid Ads',
+  'ai-solutions': 'AI Solutions & Automation',
+};
+
+/** Resolves a service id to its enquiry-form goal, safely. */
+export function serviceToGoal(serviceId: string): ProjectGoal | undefined {
+  return SERVICE_ID_TO_GOAL[serviceId];
+}
+
+export const BUDGET_RANGES = [
+  'Under $5,000',
+  '$5,000 - $15,000',
+  '$15,000 - $30,000',
+  '$30,000+',
+] as const;
+
+export const TIMELINE_OPTIONS = [
+  'ASAP (2-3 Weeks)',
+  '1 Month',
+  '2-3 Months',
+  'Flexible',
+] as const;
+
+export const CONTACT = {
+  email: 'hello@vmavix.com',
+  legalEmail: 'legal@vmavix.com',
+  tagline: 'Design • Develop • Grow',
+} as const;

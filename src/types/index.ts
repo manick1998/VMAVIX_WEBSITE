@@ -3,7 +3,7 @@ export interface ServiceItem {
   title: string;
   shortDesc: string;
   fullDesc: string;
-  category: 'web' | 'design' | 'growth' | 'ai';
+  category: "web" | "design" | "growth" | "ai";
   icon: string;
   features: string[];
   deliverables: string[];
@@ -16,7 +16,7 @@ export interface ProjectItem {
   id: string;
   title: string;
   client: string;
-  category: 'Web App' | 'E-Commerce' | 'Branding' | 'AI Platform' | 'Mobile';
+  category: "Web App" | "E-Commerce" | "Branding" | "AI Platform" | "Mobile";
   summary: string;
   heroImage: string;
   gallery: string[];
@@ -29,20 +29,10 @@ export interface ProjectItem {
   solution: string;
 }
 
-export interface ProcessStep {
-  stepNumber: string;
-  title: string;
-  tagline: string;
-  description: string;
-  deliverables: string[];
-  duration: string;
-  icon: string;
-}
-
 export interface TechItem {
   id: string;
   name: string;
-  category: 'frontend' | 'backend' | 'design' | 'cloud-ai';
+  category: "frontend" | "backend" | "design" | "cloud-ai";
   iconName: string;
   experienceYears: string;
   usageDescription: string;
@@ -66,19 +56,7 @@ export interface FAQItem {
   id: string;
   question: string;
   answer: string;
-  category: 'General' | 'Process & Timeline' | 'Pricing' | 'Technology & AI';
-}
-
-export interface PricingPlan {
-  id: string;
-  name: string;
-  tagline: string;
-  price: string;
-  period: string;
-  popular?: boolean;
-  features: string[];
-  bestFor: string;
-  deliveryTime: string;
+  category: "General" | "Process & Timeline" | "Pricing" | "Technology & AI";
 }
 
 export interface IndustryItem {

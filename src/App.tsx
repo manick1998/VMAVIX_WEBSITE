@@ -1,143 +1,96 @@
-import { useState, useEffect } from 'react';
-import { LoadingScreen } from './components/common/LoadingScreen';
-import { BackgroundCanvas } from './components/common/BackgroundCanvas';
-import { CustomCursor } from './components/common/CustomCursor';
-import { Navbar } from './components/layout/Navbar';
-import { Hero } from './components/sections/Hero';
-import { About } from './components/sections/About';
-import { Services } from './components/sections/Services';
-import { WhyUs } from './components/sections/WhyUs';
-import { Portfolio } from './components/sections/Portfolio';
-import { Process } from './components/sections/Process';
-import { TechStack } from './components/sections/TechStack';
-import { Industries } from './components/sections/Industries';
-import { Statistics } from './components/sections/Statistics';
-import { Testimonials } from './components/sections/Testimonials';
-import { Pricing } from './components/sections/Pricing';
-import { FAQ } from './components/sections/FAQ';
-import { CTA } from './components/sections/CTA';
-import { Footer } from './components/layout/Footer';
-import { ProjectBuilderModal } from './components/modals/ProjectBuilderModal';
-import { LegalModal } from './components/modals/LegalModal';
+import { useCallback, useEffect, useState } from "react";
+import { LoadingScreen } from "./components/common/LoadingScreen";
+import { BackgroundCanvas } from "./components/common/BackgroundCanvas";
+import { CustomCursor } from "./components/common/CustomCursor";
+import { Navbar } from "./components/layout/Navbar";
+import { Hero } from "./components/sections/Hero";
+import { About } from "./components/sections/About";
+import { Services } from "./components/sections/Services";
+import { WhyUs } from "./components/sections/WhyUs";
+import { Portfolio } from "./components/sections/Portfolio";
+import { TechStack } from "./components/sections/TechStack";
+import { Industries } from "./components/sections/Industries";
+import { Statistics } from "./components/sections/Statistics";
+import { Testimonials } from "./components/sections/Testimonials";
+import { FAQ } from "./components/sections/FAQ";
+import { CTA } from "./components/sections/CTA";
+import { Footer } from "./components/layout/Footer";
+import { ProjectBuilderModal } from "./components/modals/ProjectBuilderModal";
+import { LegalModal } from "./components/modals/LegalModal";
+import { SECTION_IDS } from "./data/vmavixData";
+import { useActiveSection } from "./hooks/useActiveSection";
 
 export function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState('hero');
-
-  // Modal States
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [preselectedService, setPreselectedService] = useState<string | undefined>();
-  const [preselectedPlan, setPreselectedPlan] = useState<string | undefined>();
   const [legalModalTitle, setLegalModalTitle] = useState<string | null>(null);
 
-  // Active section scroll tracking
+  const { activeSection, isScrolled } = useActiveSection(SECTION_IDS);
+
+  // Don't let the page scroll behind the intro.
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = ['hero', 'about', 'services', 'why-us', 'portfolio', 'process', 'tech-stack', 'pricing', 'faq'];
-      const scrollPos = window.scrollY + 200;
+    document.body.classList.toggle("modal-open", isLoading);
+    return () => document.body.classList.remove("modal-open");
+  }, [isLoading]);
 
-      for (const sectionId of sections) {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPos >= top && scrollPos < top + height) {
-            setActiveSection(sectionId);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+  const handleOpenProjectModal = useCallback((service?: string) => {
+    setPreselectedService(service);
+    setIsProjectModalOpen(true);
   }, []);
 
-  const handleOpenProjectModal = (service?: string, plan?: string) => {
-    setPreselectedService(service);
-    setPreselectedPlan(plan);
-    setIsProjectModalOpen(true);
-  };
+  const handleCloseProjectModal = useCallback(() => {
+    setIsProjectModalOpen(false);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-orange-500/30 selection:text-white relative">
-      {/* 1. Award-Winning Preloader */}
-      {isLoading && (
-        <LoadingScreen onComplete={() => setIsLoading(false)} />
-      )}
+    <div className="relative min-h-screen bg-ink text-white selection:bg-brand-orange/30">
+      {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
 
-      {/* 2. Precision Custom Cursor */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100000] focus:rounded-full focus:bg-brand-orange focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-white"
+      >
+        Skip to main content
+      </a>
+
       <CustomCursor />
-
-      {/* 3. Dynamic WebGL Particle & Aurora Canvas */}
       <BackgroundCanvas />
 
-      {/* Main Website Structure */}
       <div className="relative z-10">
         <Navbar
           activeSection={activeSection}
+          isScrolled={isScrolled}
           onOpenProjectModal={() => handleOpenProjectModal()}
         />
 
-        <main>
-          <Hero
-            onOpenProjectModal={() => handleOpenProjectModal()}
-          />
-
+        <main id="main">
+          <Hero onOpenProjectModal={() => handleOpenProjectModal()} />
           <About />
-
-          <Services
-            onOpenProjectModalWithService={(serviceName) =>
-              handleOpenProjectModal(serviceName)
-            }
-          />
-
+          <Services onOpenProjectModalWithService={handleOpenProjectModal} />
           <WhyUs />
-
           <Portfolio />
-
-          <Process />
-
           <TechStack />
-
           <Industries />
-
           <Statistics />
-
           <Testimonials />
-
-          <Pricing
-            onOpenProjectModalWithPlan={(planName) =>
-              handleOpenProjectModal(undefined, planName)
-            }
-          />
-
           <FAQ />
-
-          <CTA
-            onOpenProjectModal={() => handleOpenProjectModal()}
-          />
+          <CTA onOpenProjectModal={() => handleOpenProjectModal()} />
         </main>
 
         <Footer
           onOpenProjectModal={() => handleOpenProjectModal()}
-          onOpenLegalModal={(title) => setLegalModalTitle(title)}
+          onOpenLegalModal={setLegalModalTitle}
         />
       </div>
 
-      {/* Interactive Project Proposal Configurator Modal */}
       <ProjectBuilderModal
         isOpen={isProjectModalOpen}
-        onClose={() => setIsProjectModalOpen(false)}
+        onClose={handleCloseProjectModal}
         preselectedService={preselectedService}
-        preselectedPlan={preselectedPlan}
       />
 
-      {/* Legal & Security Modal */}
-      <LegalModal
-        title={legalModalTitle}
-        onClose={() => setLegalModalTitle(null)}
-      />
+      <LegalModal title={legalModalTitle} onClose={() => setLegalModalTitle(null)} />
     </div>
   );
 }

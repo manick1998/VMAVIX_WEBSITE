@@ -77,7 +77,7 @@ export const CustomCursor: React.FC = () => {
       {/* Precision Core Cursor Dot */}
       <div
         className={`fixed top-0 left-0 w-2.5 h-2.5 bg-white rounded-full transition-transform duration-75 ease-out shadow-[0_0_10px_#00F2FE] ${
-          isMouseDown ? 'scale-150 bg-orange-500' : isHovering ? 'scale-125 bg-cyan-400' : ''
+          isMouseDown ? 'scale-150 bg-brand-orange' : isHovering ? 'scale-125 bg-brand-cyan' : ''
         }`}
         style={{
           transform: `translate3d(${pos.x - 5}px, ${pos.y - 5}px, 0)`
@@ -88,9 +88,9 @@ export const CustomCursor: React.FC = () => {
       <div
         className={`fixed top-0 left-0 rounded-full border border-white/30 transition-all duration-300 ease-out flex items-center justify-center ${
           isHovering
-            ? 'w-14 h-14 border-orange-500/80 bg-orange-500/10 backdrop-blur-[1px] shadow-[0_0_20px_rgba(255,94,58,0.4)]'
+            ? 'w-14 h-14 border-brand-orange/80 bg-brand-orange/10 backdrop-blur-[1px] shadow-[0_0_20px_rgba(255,94,58,0.4)]'
             : isMouseDown
-            ? 'w-8 h-8 border-cyan-400 bg-cyan-400/20'
+            ? 'w-8 h-8 border-brand-cyan bg-brand-cyan/20'
             : 'w-10 h-10 border-white/20'
         }`}
         style={{
@@ -100,7 +100,7 @@ export const CustomCursor: React.FC = () => {
         }}
       >
         {isHovering && (
-          <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-ping" />
+          <div className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-ping" />
         )}
       </div>
     </div>

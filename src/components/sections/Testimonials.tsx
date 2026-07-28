@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useScrollReveal } from '../../hooks/useScrollReveal';
 import { TESTIMONIALS } from '../../data/vmavixData';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
 
 export const Testimonials: React.FC = () => {
+  const revealRef = useScrollReveal<HTMLDivElement>();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextTestimonial = () => {
@@ -21,12 +23,12 @@ export const Testimonials: React.FC = () => {
   return (
     <section id="testimonials" className="py-28 relative overflow-hidden bg-[#07070B]">
       {/* Glow Mesh */}
-      <div className="absolute top-1/2 left-1/3 w-[500px] h-[500px] bg-gradient-to-tr from-pink-600/15 via-purple-600/10 to-transparent rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/3 w-[min(95vw,500px)] h-[500px] bg-gradient-to-tr from-brand-pink/15 via-brand-purple/10 to-transparent rounded-full blur-[150px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-orange-400 font-mono text-xs uppercase tracking-widest mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-brand-orange font-mono text-xs uppercase tracking-widest mb-4">
             CLIENT ENDORSEMENTS
           </div>
 
@@ -36,7 +38,7 @@ export const Testimonials: React.FC = () => {
         </div>
 
         {/* Featured Main Testimonial Card */}
-        <div className="max-w-4xl mx-auto">
+        <div ref={revealRef} className="reveal mx-auto max-w-4xl">
           <div className="glass-panel rounded-3xl p-8 sm:p-12 border border-white/20 shadow-2xl relative overflow-hidden">
             <Quote className="absolute top-6 right-8 w-24 h-24 text-white/5 pointer-events-none" />
 
@@ -54,8 +56,12 @@ export const Testimonials: React.FC = () => {
               <div className="flex items-center gap-4">
                 <img
                   src={current.avatar}
-                  alt={current.author}
-                  className="w-14 h-14 rounded-full object-cover border-2 border-orange-500/50"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  width={56}
+                  height={56}
+                  className="h-14 w-14 rounded-full border-2 border-brand-orange/50 object-cover"
                 />
                 <div>
                   <h4 className="font-syne font-bold text-lg text-white">{current.author}</h4>
@@ -64,7 +70,7 @@ export const Testimonials: React.FC = () => {
               </div>
 
               {/* Metric Tag */}
-              <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500/10 to-pink-500/10 border border-orange-500/30 text-orange-400 font-mono text-xs font-bold">
+              <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-orange/10 to-brand-pink/10 border border-brand-orange/30 text-brand-orange font-mono text-xs font-bold">
                 {current.metrics}
               </div>
             </div>
@@ -81,7 +87,7 @@ export const Testimonials: React.FC = () => {
                     setCurrentIndex(idx);
                   }}
                   className={`h-2 rounded-full transition-all duration-300 ${
-                    currentIndex === idx ? 'w-8 bg-gradient-to-r from-orange-500 to-pink-500' : 'w-2 bg-white/20'
+                    currentIndex === idx ? 'w-8 bg-gradient-to-r from-brand-orange to-brand-pink' : 'w-2 bg-white/20'
                   }`}
                 />
               ))}
@@ -89,13 +95,17 @@ export const Testimonials: React.FC = () => {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={prevTestimonial}
+                type="button"
+              onClick={prevTestimonial}
+              aria-label="Previous testimonial"
                 className="p-3 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
-                onClick={nextTestimonial}
+                type="button"
+              onClick={nextTestimonial}
+              aria-label="Next testimonial"
                 className="p-3 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white transition-colors"
               >
                 <ChevronRight className="w-5 h-5" />

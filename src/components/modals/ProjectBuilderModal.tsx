@@ -1,185 +1,281 @@
-import React, { useState } from 'react';
-import { X, Check, ArrowRight, CheckCircle2, Send } from 'lucide-react';
-import confetti from 'canvas-confetti';
-import { soundManager } from '../../utils/audio';
+import React, { useEffect, useState } from "react";
+import { X, Check, ArrowRight, CheckCircle2, Send, Loader2, AlertCircle } from "lucide-react";
+import confetti from "canvas-confetti";
+import { soundManager } from "../../utils/audio";
+import { useModalA11y } from "../../hooks/useModalA11y";
+import {
+  PROJECT_GOALS,
+  BUDGET_RANGES,
+  TIMELINE_OPTIONS,
+  CONTACT,
+  type ProjectGoal,
+} from "../../data/vmavixData";
 
 interface ProjectBuilderModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** A value from PROJECT_GOALS, resolved by the caller via serviceToGoal(). */
   preselectedService?: string;
-  preselectedPlan?: string;
 }
+
+type Status = "idle" | "submitting" | "success" | "error";
+
+/**
+ * Endpoint for enquiries. Set VITE_CONTACT_ENDPOINT in .env to a real
+ * form handler (Formspree, Web3Forms, your own API...).
+ *
+ * If it is not configured we fall back to opening the user's mail client
+ * with the enquiry pre-filled, so a lead is never silently lost.
+ */
+const ENDPOINT = import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined;
 
 export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
   isOpen,
   onClose,
   preselectedService,
-  preselectedPlan
 }) => {
   const [step, setStep] = useState(1);
-  const [submitted, setSubscribed] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // Form State
-  const [selectedGoals, setSelectedGoals] = useState<string[]>(
-    preselectedService ? [preselectedService] : []
-  );
-  const [selectedBudget, setSelectedBudget] = useState<string>(
-    preselectedPlan || '$15,000 - $30,000'
-  );
-  const [selectedTimeline, setSelectedTimeline] = useState<string>('ASAP (2-4 Weeks)');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [company, setCompany] = useState('');
-  const [message, setMessage] = useState('');
+  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const [selectedBudget, setSelectedBudget] = useState<string>(BUDGET_RANGES[1]);
+  const [selectedTimeline, setSelectedTimeline] = useState<string>(TIMELINE_OPTIONS[0]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [company, setCompany] = useState("");
+  const [message, setMessage] = useState("");
+  const [honeypot, setHoneypot] = useState(""); // spam trap
+
+  const dialogRef = useModalA11y(isOpen, onClose);
+
+  /**
+   * Sync props -> state every time the modal opens.
+   * The old build read these only in the useState initialiser, which never
+   * re-ran, so preselection silently did nothing after the first mount.
+   */
+  useEffect(() => {
+    if (!isOpen) return;
+    setStep(1);
+    setStatus("idle");
+    setErrorMsg("");
+    setSelectedGoals(
+      preselectedService && (PROJECT_GOALS as readonly string[]).includes(preselectedService)
+        ? [preselectedService]
+        : []
+    );
+  }, [isOpen, preselectedService]);
 
   if (!isOpen) return null;
 
-  const goalsList = [
-    'Website Design & UI/UX',
-    'Website Engineering (React/Next.js)',
-    'E-Commerce Platform',
-    'Brand Identity & Logo Design',
-    'SEO & Organic Growth Sprint',
-    'Digital Marketing & Paid Ads',
-    'Custom AI & Automation'
-  ];
-
-  const budgetsList = [
-    '$7,500 - $15,000',
-    '$15,000 - $30,000',
-    '$30,000 - $50,000',
-    '$50,000+'
-  ];
-
-  const timelinesList = [
-    'ASAP (2-3 Weeks)',
-    '1 Month',
-    '2-3 Months',
-    'Flexible'
-  ];
-
-  const toggleGoal = (goal: string) => {
+  const toggleGoal = (goal: ProjectGoal) => {
     soundManager.playClick();
-    if (selectedGoals.includes(goal)) {
-      setSelectedGoals(selectedGoals.filter((g) => g !== goal));
-    } else {
-      setSelectedGoals([...selectedGoals, goal]);
+    setSelectedGoals((prev) =>
+      prev.includes(goal) ? prev.filter((g) => g !== goal) : [...prev, goal]
+    );
+  };
+
+  const buildPayload = () => ({
+    name,
+    email,
+    company: company || "Not provided",
+    scope: selectedGoals.join(", ") || "Not specified",
+    budget: selectedBudget,
+    timeline: selectedTimeline,
+    message: message || "No brief provided",
+    submittedAt: new Date().toISOString(),
+    source: "vmavix.com project configurator",
+  });
+
+  const mailtoFallback = () => {
+    const p = buildPayload();
+    const body = [
+      `Name: ${p.name}`,
+      `Email: ${p.email}`,
+      `Company: ${p.company}`,
+      "",
+      `Scope: ${p.scope}`,
+      `Budget: ${p.budget}`,
+      `Timeline: ${p.timeline}`,
+      "",
+      "Brief:",
+      p.message,
+    ].join("\n");
+
+    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
+      `New project enquiry — ${p.company}`
+    )}&body=${encodeURIComponent(body)}`;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (honeypot) return; // bot
+
+    setStatus("submitting");
+    setErrorMsg("");
+
+    try {
+      if (ENDPOINT) {
+        const res = await fetch(ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(buildPayload()),
+        });
+        if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      } else {
+        // No endpoint configured — hand off to the user's mail client.
+        mailtoFallback();
+      }
+
+      soundManager.playSuccess();
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        confetti({ particleCount: 110, spread: 80, origin: { y: 0.6 } });
+      }
+      setStatus("success");
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(
+        err instanceof Error
+          ? `${err.message}. You can email us directly at ${CONTACT.email}.`
+          : "Something went wrong."
+      );
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    soundManager.playSuccess();
-    confetti({
-      particleCount: 120,
-      spread: 80,
-      origin: { y: 0.6 }
-    });
-    setSubscribed(true);
-  };
+  const stepTitle =
+    step === 1
+      ? "What do you need help with?"
+      : step === 2
+        ? "Budget & timeline"
+        : "Your contact details";
 
   return (
-    <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-300">
-      <div className="glass-panel max-w-2xl w-full rounded-3xl p-6 sm:p-10 border border-white/20 shadow-2xl relative my-auto">
-        {/* Close Button */}
+    <div
+      className="fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/85 p-4 backdrop-blur-2xl animate-fade-in sm:p-6"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-modal-title"
+        tabIndex={-1}
+        className="glass-panel relative my-auto w-full max-w-2xl rounded-3xl border border-white/20 p-6 shadow-2xl animate-scale-in sm:p-10"
+      >
         <button
+          type="button"
           onClick={() => {
             soundManager.playClick();
             onClose();
           }}
-          className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
+          aria-label="Close enquiry form"
+          className="absolute right-5 top-5 rounded-full bg-white/10 p-2 text-gray-300 transition-colors hover:bg-white/20 hover:text-white"
         >
-          <X className="w-5 h-5" />
+          <X className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        {submitted ? (
-          /* Submission Confirmation Screen */
-          <div className="text-center py-8 space-y-6">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400 flex items-center justify-center mx-auto animate-bounce">
-              <CheckCircle2 className="w-10 h-10" />
+        {status === "success" ? (
+          <div className="space-y-6 py-8 text-center">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-emerald-500 bg-emerald-500/20 text-emerald-400">
+              <CheckCircle2 className="h-10 w-10" aria-hidden="true" />
             </div>
 
-            <h3 className="font-syne font-extrabold text-3xl sm:text-4xl text-white">
-              Proposal Request Received!
+            <h3 id="project-modal-title" className="font-syne text-3xl font-extrabold text-white sm:text-4xl">
+              Enquiry sent
             </h3>
 
-            <p className="text-sm text-gray-300 max-w-md mx-auto leading-relaxed">
-              Thank you, <span className="text-white font-bold">{name}</span>. Our lead digital architect is reviewing your project parameters and will reach out within <span className="text-orange-400 font-bold">2 business hours</span>.
+            <p className="mx-auto max-w-md text-sm leading-relaxed text-gray-300">
+              Thanks{name ? `, ${name.split(" ")[0]}` : ""}. We&apos;ve got your brief and will
+              reply to <span className="font-semibold text-white">{email}</span> within one
+              business day.
             </p>
 
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 max-w-md mx-auto text-xs text-left space-y-2 font-mono">
-              <div className="text-gray-400">SUMMARY CONFIRMATION:</div>
-              <div className="text-white"><span className="text-gray-400">Company:</span> {company || 'N/A'}</div>
-              <div className="text-white"><span className="text-gray-400">Selected Scope:</span> {selectedGoals.join(', ') || 'Custom'}</div>
-              <div className="text-white"><span className="text-gray-400">Budget Range:</span> {selectedBudget}</div>
+            <div className="mx-auto max-w-md space-y-2 rounded-2xl border border-white/10 bg-white/5 p-4 text-left font-mono text-xs">
+              <div className="text-gray-400">SUMMARY</div>
+              <div className="text-white">
+                <span className="text-gray-400">Company:</span> {company || "—"}
+              </div>
+              <div className="text-white">
+                <span className="text-gray-400">Scope:</span> {selectedGoals.join(", ") || "Custom"}
+              </div>
+              <div className="text-white">
+                <span className="text-gray-400">Budget:</span> {selectedBudget}
+              </div>
+              <div className="text-white">
+                <span className="text-gray-400">Timeline:</span> {selectedTimeline}
+              </div>
             </div>
 
             <button
+              type="button"
               onClick={onClose}
-              className="px-8 py-3.5 rounded-full font-bold text-xs text-white bg-gradient-to-r from-orange-500 to-pink-500"
+              className="rounded-full bg-gradient-to-r from-brand-orange to-brand-pink px-8 py-3.5 text-xs font-bold text-white"
             >
-              Return to Website
+              Back to site
             </button>
           </div>
         ) : (
-          /* Multi-Step Wizard */
           <div>
-            {/* Step Indicators */}
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
+            <div className="mb-8 flex items-center justify-between gap-4 border-b border-white/10 pb-4">
               <div>
-                <span className="font-mono text-xs text-orange-400 font-bold uppercase tracking-widest block">
-                  PROJECT CONFIGURATOR • STEP 0{step} OF 3
+                <span className="block font-mono text-xs font-bold uppercase tracking-widest text-brand-orange">
+                  Step {step} of 3
                 </span>
-                <h3 className="font-syne font-extrabold text-xl sm:text-2xl text-white">
-                  {step === 1 && 'What are your primary goals?'}
-                  {step === 2 && 'Budget & Delivery Timeline'}
-                  {step === 3 && 'Contact Information'}
+                <h3
+                  id="project-modal-title"
+                  className="font-syne text-xl font-extrabold text-white sm:text-2xl"
+                >
+                  {stepTitle}
                 </h3>
               </div>
 
-              {/* Progress dots */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5" aria-hidden="true">
                 {[1, 2, 3].map((s) => (
                   <div
                     key={s}
                     className={`h-2 rounded-full transition-all ${
                       step === s
-                        ? 'w-6 bg-gradient-to-r from-orange-500 to-pink-500'
+                        ? "w-6 bg-gradient-to-r from-brand-orange to-brand-pink"
                         : step > s
-                        ? 'w-2 bg-emerald-400'
-                        : 'w-2 bg-white/20'
+                          ? "w-2 bg-emerald-400"
+                          : "w-2 bg-white/20"
                     }`}
                   />
                 ))}
               </div>
             </div>
 
-            {/* STEP 1: Goal Selection */}
+            {/* STEP 1 */}
             {step === 1 && (
               <div className="space-y-6">
-                <p className="text-xs text-gray-300">Select all capabilities that apply to your brand vision:</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {goalsList.map((goal) => {
+                <p className="text-xs text-gray-300">Select everything that applies:</p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {PROJECT_GOALS.map((goal) => {
                     const isSelected = selectedGoals.includes(goal);
                     return (
                       <button
                         key={goal}
                         type="button"
+                        aria-pressed={isSelected}
                         onClick={() => toggleGoal(goal)}
-                        className={`p-3.5 rounded-2xl border text-left text-xs font-semibold transition-all flex items-center justify-between ${
+                        className={`flex items-center justify-between rounded-2xl border p-3.5 text-left text-xs font-semibold transition-all ${
                           isSelected
-                            ? 'bg-gradient-to-r from-orange-500/20 to-pink-500/20 border-orange-500 text-white'
-                            : 'bg-white/5 border-white/10 text-gray-300 hover:text-white hover:border-white/20'
+                            ? "border-brand-orange bg-gradient-to-r from-brand-orange/20 to-brand-pink/20 text-white"
+                            : "border-white/10 bg-white/5 text-gray-300 hover:border-white/25 hover:text-white"
                         }`}
                       >
                         <span>{goal}</span>
-                        {isSelected && <Check className="w-4 h-4 text-orange-400 shrink-0" />}
+                        {isSelected && (
+                          <Check className="h-4 w-4 shrink-0 text-brand-orange" aria-hidden="true" />
+                        )}
                       </button>
                     );
                   })}
                 </div>
 
-                <div className="pt-4 flex justify-end">
+                <div className="flex justify-end pt-2">
                   <button
                     type="button"
                     disabled={selectedGoals.length === 0}
@@ -187,166 +283,221 @@ export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
                       soundManager.playClick();
                       setStep(2);
                     }}
-                    className="px-8 py-3.5 rounded-full font-bold text-xs text-white bg-gradient-to-r from-orange-500 to-pink-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-orange to-brand-pink px-8 py-3.5 text-xs font-bold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <span>Next: Budget & Timeline</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <span>Next: budget &amp; timeline</span>
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 2: Budget & Timeline */}
+            {/* STEP 2 */}
             {step === 2 && (
               <div className="space-y-6">
-                <div>
-                  <label className="font-mono text-xs text-gray-300 uppercase block mb-3 font-bold">
-                    ESTIMATED BUDGET RANGE
-                  </label>
+                <fieldset>
+                  <legend className="mb-3 block font-mono text-xs font-bold uppercase text-gray-300">
+                    Estimated budget
+                  </legend>
                   <div className="grid grid-cols-2 gap-3">
-                    {budgetsList.map((b) => (
+                    {BUDGET_RANGES.map((b) => (
                       <button
                         key={b}
                         type="button"
+                        aria-pressed={selectedBudget === b}
                         onClick={() => {
                           soundManager.playClick();
                           setSelectedBudget(b);
                         }}
-                        className={`p-3.5 rounded-2xl border text-center text-xs font-bold transition-all ${
+                        className={`rounded-2xl border p-3.5 text-center text-xs font-bold transition-all ${
                           selectedBudget === b
-                            ? 'bg-gradient-to-r from-orange-500/20 to-pink-500/20 border-orange-500 text-white'
-                            : 'bg-white/5 border-white/10 text-gray-300 hover:text-white'
+                            ? "border-brand-orange bg-gradient-to-r from-brand-orange/20 to-brand-pink/20 text-white"
+                            : "border-white/10 bg-white/5 text-gray-300 hover:text-white"
                         }`}
                       >
                         {b}
                       </button>
                     ))}
                   </div>
-                </div>
+                </fieldset>
 
-                <div>
-                  <label className="font-mono text-xs text-gray-300 uppercase block mb-3 font-bold">
-                    DESIRED LAUNCH TIMELINE
-                  </label>
+                <fieldset>
+                  <legend className="mb-3 block font-mono text-xs font-bold uppercase text-gray-300">
+                    Desired timeline
+                  </legend>
                   <div className="grid grid-cols-2 gap-3">
-                    {timelinesList.map((t) => (
+                    {TIMELINE_OPTIONS.map((t) => (
                       <button
                         key={t}
                         type="button"
+                        aria-pressed={selectedTimeline === t}
                         onClick={() => {
                           soundManager.playClick();
                           setSelectedTimeline(t);
                         }}
-                        className={`p-3.5 rounded-2xl border text-center text-xs font-semibold transition-all ${
+                        className={`rounded-2xl border p-3.5 text-center text-xs font-semibold transition-all ${
                           selectedTimeline === t
-                            ? 'bg-gradient-to-r from-orange-500/20 to-pink-500/20 border-orange-500 text-white'
-                            : 'bg-white/5 border-white/10 text-gray-300 hover:text-white'
+                            ? "border-brand-orange bg-gradient-to-r from-brand-orange/20 to-brand-pink/20 text-white"
+                            : "border-white/10 bg-white/5 text-gray-300 hover:text-white"
                         }`}
                       >
                         {t}
                       </button>
                     ))}
                   </div>
-                </div>
+                </fieldset>
 
-                <div className="pt-4 flex items-center justify-between">
+                <div className="flex items-center justify-between pt-2">
                   <button
                     type="button"
                     onClick={() => {
                       soundManager.playClick();
                       setStep(1);
                     }}
-                    className="px-6 py-3 rounded-full text-xs font-semibold text-gray-400 hover:text-white"
+                    className="rounded-full px-6 py-3 text-xs font-semibold text-gray-400 hover:text-white"
                   >
                     Back
                   </button>
-
                   <button
                     type="button"
                     onClick={() => {
                       soundManager.playClick();
                       setStep(3);
                     }}
-                    className="px-8 py-3.5 rounded-full font-bold text-xs text-white bg-gradient-to-r from-orange-500 to-pink-500 flex items-center gap-2"
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-orange to-brand-pink px-8 py-3.5 text-xs font-bold text-white"
                   >
-                    <span>Next: Final Details</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <span>Next: your details</span>
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 3: Contact Details & Submit */}
+            {/* STEP 3 */}
             {step === 3 && (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate={false}>
+                {/* honeypot */}
+                <input
+                  type="text"
+                  name="company_website"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="pointer-events-none absolute h-0 w-0 opacity-0"
+                />
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-xs font-mono text-gray-300 block mb-1">YOUR NAME *</label>
+                    <label htmlFor="pb-name" className="mb-1 block font-mono text-xs text-gray-300">
+                      Your name *
+                    </label>
                     <input
+                      id="pb-name"
                       type="text"
                       required
+                      autoComplete="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Alexander Vance"
-                      className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-orange-500"
+                      placeholder="Jane Cooper"
+                      className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-xs text-white placeholder-gray-500 focus:border-brand-orange focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-mono text-gray-300 block mb-1">WORK EMAIL *</label>
+                    <label htmlFor="pb-email" className="mb-1 block font-mono text-xs text-gray-300">
+                      Work email *
+                    </label>
                     <input
+                      id="pb-email"
                       type="email"
                       required
+                      autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="alexander@company.com"
-                      className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-orange-500"
+                      placeholder="jane@company.com"
+                      className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-xs text-white placeholder-gray-500 focus:border-brand-orange focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-mono text-gray-300 block mb-1">COMPANY / BRAND NAME</label>
+                  <label htmlFor="pb-company" className="mb-1 block font-mono text-xs text-gray-300">
+                    Company / brand
+                  </label>
                   <input
+                    id="pb-company"
                     type="text"
+                    autoComplete="organization"
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
-                    placeholder="e.g. Aether Dynamics"
-                    className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-orange-500"
+                    placeholder="Acme Inc."
+                    className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-xs text-white placeholder-gray-500 focus:border-brand-orange focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-mono text-gray-300 block mb-1">PROJECT VISION BRIEF</label>
+                  <label htmlFor="pb-brief" className="mb-1 block font-mono text-xs text-gray-300">
+                    Project brief
+                  </label>
                   <textarea
+                    id="pb-brief"
                     rows={3}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Tell us about your product, targets, or specific technical requirements..."
-                    className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-orange-500"
+                    placeholder="Tell us about your product, goals or technical requirements..."
+                    className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-xs text-white placeholder-gray-500 focus:border-brand-orange focus:outline-none"
                   />
                 </div>
 
-                <div className="pt-4 flex items-center justify-between">
+                {status === "error" && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300"
+                  >
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between pt-2">
                   <button
                     type="button"
                     onClick={() => {
                       soundManager.playClick();
                       setStep(2);
                     }}
-                    className="px-6 py-3 rounded-full text-xs font-semibold text-gray-400 hover:text-white"
+                    className="rounded-full px-6 py-3 text-xs font-semibold text-gray-400 hover:text-white"
                   >
                     Back
                   </button>
 
                   <button
                     type="submit"
-                    className="px-10 py-4 rounded-full font-extrabold text-xs text-white bg-gradient-to-r from-orange-500 via-pink-500 to-cyan-500 hover:shadow-[0_0_30px_rgba(255,94,58,0.5)] transition-all flex items-center gap-2"
+                    disabled={status === "submitting"}
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-orange via-brand-pink to-brand-cyan px-10 py-4 text-xs font-extrabold text-white transition-all hover:shadow-[0_0_30px_rgba(255,94,58,0.5)] disabled:opacity-60"
                   >
-                    <Send className="w-4 h-4" />
-                    <span>Submit Project Scope</span>
+                    {status === "submitting" ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4" aria-hidden="true" />
+                        <span>Send enquiry</span>
+                      </>
+                    )}
                   </button>
                 </div>
+
+                <p className="pt-1 text-center text-[11px] text-gray-500">
+                  Prefer email? Write to{" "}
+                  <a href={`mailto:${CONTACT.email}`} className="text-brand-orange hover:underline">
+                    {CONTACT.email}
+                  </a>
+                </p>
               </form>
             )}
           </div>
