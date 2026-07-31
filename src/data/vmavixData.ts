@@ -310,10 +310,10 @@ export const TECH_STACK: TechItem[] = [
   { id: 'ai', name: 'AI & LLMs', category: 'cloud-ai', iconName: 'Cpu', experienceYears: '4+', usageDescription: 'OpenAI GPT-4o, Claude 3.5 Sonnet, LangChain, and custom RAG agents.', perfScore: 98 }
 ];
 
-export const testimonials = [
+export const TESTIMONIALS: Testimonial[] = [
   {
     id: "1",
-    name: "KUTTY",
+    name: "Rajesh Sharma",
     role: "Chief Technology Officer",
     company: "NexGen FinTech",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
@@ -348,6 +348,8 @@ export const testimonials = [
     highlight: "99.9% Uptime Achieved"
   }
 ];
+
+export const testimonials = TESTIMONIALS;
 
 export const FAQ_ITEMS: FAQItem[] = [
   {
@@ -534,4 +536,3 @@ export const TIMELINE_OPTIONS = [
   '2-3 Months',
   'Flexible',
 ] as const;
-
