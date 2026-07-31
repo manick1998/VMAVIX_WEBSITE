@@ -310,52 +310,42 @@ export const TECH_STACK: TechItem[] = [
   { id: 'ai', name: 'AI & LLMs', category: 'cloud-ai', iconName: 'Cpu', experienceYears: '4+', usageDescription: 'OpenAI GPT-4o, Claude 3.5 Sonnet, LangChain, and custom RAG agents.', perfScore: 98 }
 ];
 
-export const TESTIMONIALS: Testimonial[] = [
+export const testimonials = [
   {
-    id: '1',
+    id: "1",
+    name: "KUTTY",
+    role: "Chief Technology Officer",
+    company: "NexGen FinTech",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
     quote: "VMAVIX transformed our digital footprint entirely. Our web conversion shot up by 340% within 30 days of launch. They aren't just developers; they are elite brand architects.",
-    author: "Elena Rostova",
-    role: "Chief Marketing Officer",
-    company: "Aether Dynamics Aerospace",
-    companyLogo: "AETHER",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
-    metrics: "+340% Conversion Increase",
-    rating: 5,
-    featured: true
+    highlight: "+340% Conversion Increase"
   },
   {
-    id: '2',
-    quote: "The visual luxury and speed VMAVIX delivered for our e-commerce platform left our board speechless. We generated over $2.4M in pre-orders in the first 48 hours.",
-    author: "Marc Sterling",
+    id: "2",
+    name: "Ananya Krishnan",
     role: "Founder & CEO",
-    company: "Chronos Haute Horlogerie",
-    companyLogo: "CHRONOS",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
-    metrics: "$2.4M Sales in 48 Hours",
-    rating: 5,
-    featured: true
+    company: "Zvita HealthTech",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200",
+    quote: "Building our AI-powered health platform with VMAVIX was seamless. Their engineering standards and UI/UX craftsmanship are unmatched in the industry.",
+    highlight: "2.5x Speed Optimization"
   },
   {
-    id: '3',
-    quote: "Working with VMAVIX felt like stepping into the future. Their AI integration shaved 80% off our operational overhead while maintaining a 99.8% customer satisfaction score.",
-    author: "Dr. Sarah Chen",
-    role: "VP of Product",
-    company: "Nexus AI Labs",
-    companyLogo: "NEXUS AI",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop",
-    metrics: "80% Operational Savings",
-    rating: 5
+    id: "3",
+    name: "Vikram Adithya",
+    role: "Head of Product",
+    company: "LogiSwift Innovations",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+    quote: "The mobile and web architecture designed by VMAVIX scaled our operations effortlessly across major Indian metros. Exceptional technical partner!",
+    highlight: "+180% Engagement Growth"
   },
   {
-    id: '4',
-    quote: "If you want a generic template, hire someone else. If you want an award-winning digital flagship that dominates your industry, VMAVIX is the only option on Earth.",
-    author: "Julian Vance",
-    role: "Managing Partner",
-    company: "Hyperion Capital Management",
-    companyLogo: "HYPERION",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
-    metrics: "$8.4B Managed Portfolios",
-    rating: 5
+    id: "4",
+    name: "Priya Sundaram",
+    role: "Co-Founder",
+    company: "EduElevate India",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=200",
+    quote: "VMAVIX delivered our enterprise platform right on schedule with top-notch security and performance. Their team feels like an extension of our own core team.",
+    highlight: "99.9% Uptime Achieved"
   }
 ];
 
