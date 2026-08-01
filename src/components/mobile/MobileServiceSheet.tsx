@@ -1,5 +1,6 @@
 import React from "react";
-import { CheckCircle2, Clock, BarChart3, ArrowUpRight, MessageCircle } from "lucide-react";
+import { CheckCircle2, Clock, BarChart3, ArrowUpRight } from "lucide-react";
+import { WhatsAppIcon } from "../ui/WhatsAppIcon";
 import type { ServiceItem } from "../../types";
 import { serviceToGoal } from "../../data/vmavixData";
 import { MobileSheet } from "./MobileSheet";
@@ -96,7 +97,7 @@ export const MobileServiceSheet: React.FC<MobileServiceSheetProps> = ({
           href={quickWhatsAppUrl(`Hi VMAVIX, I'm interested in ${service.title}.`)}
           external
         >
-          <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+          <WhatsAppIcon className="h-[18px] w-[18px]" aria-hidden="true" />
           Ask on WhatsApp
         </TouchButton>
       </div>

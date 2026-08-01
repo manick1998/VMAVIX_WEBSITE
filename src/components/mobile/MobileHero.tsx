@@ -1,5 +1,6 @@
 import React from "react";
-import { ArrowUpRight, MessageCircle } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { WhatsAppIcon } from "../ui/WhatsAppIcon";
 import { soundManager } from "../../utils/audio";
 import { quickWhatsAppUrl } from "../../config/contact";
 import { HeroAtmosphere } from "./HeroAtmosphere";
@@ -197,7 +198,7 @@ export const MobileHero: React.FC<MobileHeroProps> = ({ onOpenProjectModal }) =>
             className="btn-lux btn-lux--wa"
           >
             <span className="relative z-10 flex items-center justify-center gap-2.5">
-              <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+              <WhatsAppIcon className="h-[18px] w-[18px]" aria-hidden="true" />
               Chat on WhatsApp
             </span>
           </a>

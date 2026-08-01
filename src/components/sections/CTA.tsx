@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowUpRight, Sparkles, ShieldCheck, Zap, MessageCircle, Phone } from 'lucide-react';
+import { ArrowUpRight, Sparkles, ShieldCheck, Zap, Phone } from 'lucide-react';
+import { WhatsAppIcon } from '../ui/WhatsAppIcon';
 import { quickWhatsAppUrl, PHONE_E164, PHONE_DISPLAY } from '../../config/contact';
 import { soundManager } from '../../utils/audio';
 
@@ -51,7 +52,7 @@ export const CTA: React.FC<CTAProps> = ({ onOpenProjectModal }) => {
               onMouseEnter={() => soundManager.playHover()}
               className="flex w-full items-center justify-center gap-3 rounded-full bg-[linear-gradient(135deg,#25D366,#128C7E)] px-10 py-5 text-base font-extrabold text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_50px_rgba(37,211,102,0.65)] sm:w-auto"
             >
-              <MessageCircle className="h-5 w-5" aria-hidden="true" />
+              <WhatsAppIcon className="h-5 w-5" aria-hidden="true" />
               <span>WhatsApp us</span>
             </a>
           </div>

@@ -1,5 +1,6 @@
 import React from "react";
-import { ArrowUpRight, MessageCircle, Phone, Mail, Clock, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Phone, Mail, Clock, ShieldCheck } from "lucide-react";
+import { WhatsAppIcon } from "../ui/WhatsAppIcon";
 import { useReveal } from "../../hooks/useReveal";
 import { TouchButton } from "../ui/TouchButton";
 import { quickWhatsAppUrl, PHONE_E164, PHONE_DISPLAY, EMAIL } from "../../config/contact";
@@ -35,7 +36,7 @@ export const MobileCTA: React.FC<MobileCTAProps> = ({ onOpenProjectModal }) => {
 
         <div className="mt-7 flex flex-col gap-3">
           <TouchButton variant="whatsapp" fullWidth href={quickWhatsAppUrl()} external>
-            <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+            <WhatsAppIcon className="h-[18px] w-[18px]" aria-hidden="true" />
             WhatsApp us now
           </TouchButton>
 

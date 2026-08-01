@@ -17,7 +17,6 @@ export interface EnquiryPayload {
   email: string;
   company?: string;
   scope: string;
-  budget: string;
   timeline: string;
   message?: string;
 }
@@ -39,7 +38,6 @@ export function buildWhatsAppMessage(p: EnquiryPayload): string {
   lines.push(
     "",
     `*Scope:* ${p.scope}`,
-    `*Budget:* ${p.budget}`,
     `*Timeline:* ${p.timeline}`
   );
 

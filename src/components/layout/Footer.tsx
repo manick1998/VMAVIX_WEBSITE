@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Logo } from "../common/Logo";
-import { ArrowUpRight, CheckCircle2, Send, Mail, MessageCircle, Phone } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Send, Mail, Phone } from "lucide-react";
+import { WhatsAppIcon } from "../ui/WhatsAppIcon";
 import confetti from "canvas-confetti";
 import { soundManager } from "../../utils/audio";
 import { NAV_LINKS, SERVICES_DATA } from "../../data/vmavixData";
@@ -171,7 +172,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenProjectModal, onOpenLegalM
               onClick={() => soundManager.playClick()}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#25D366,#128C7E)] py-3 text-xs font-bold text-white transition-all hover:shadow-[0_8px_24px_-8px_rgba(37,211,102,0.8)]"
             >
-              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              <WhatsAppIcon className="h-4 w-4" aria-hidden="true" />
               <span>WhatsApp us</span>
             </a>
 

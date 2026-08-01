@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { MessageCircle, Phone, X, Plus, Sparkles } from "lucide-react";
+import { Phone, X, Plus, Sparkles } from "lucide-react";
+import { WhatsAppIcon } from "../ui/WhatsAppIcon";
 import { soundManager } from "../../utils/audio";
 import { quickWhatsAppUrl, PHONE_E164, PHONE_DISPLAY } from "../../config/contact";
 
@@ -122,7 +123,7 @@ export const FloatingContact: React.FC<FloatingContactProps> = ({ onOpenProjectM
             className="absolute inset-0 animate-ping rounded-full bg-[#25D366]/35"
             style={{ animationDuration: "2.8s" }}
           />
-          <MessageCircle className="relative h-7 w-7 text-white" aria-hidden="true" />
+          <WhatsAppIcon className="relative h-7 w-7 text-white" aria-hidden="true" />
         </a>
       </div>
     </div>

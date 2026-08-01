@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Home, LayoutGrid, Briefcase, Sparkles, X, MessageCircle, Phone } from "lucide-react";
+import { Home, LayoutGrid, Briefcase, Sparkles, X, Phone } from "lucide-react";
+import { WhatsAppIcon } from "../ui/WhatsAppIcon";
 import { soundManager } from "../../utils/audio";
 import { NAV_LINKS } from "../../data/vmavixData";
 import { quickWhatsAppUrl, PHONE_E164, PHONE_DISPLAY } from "../../config/contact";
@@ -132,7 +133,7 @@ export const MobileDock: React.FC<MobileDockProps> = ({
               onClick={() => soundManager.playClick()}
               className="flex items-center justify-center gap-2 rounded-2xl bg-[#25D366]/15 px-4 py-3.5 text-sm font-bold text-[#25D366] active:scale-[0.96]"
             >
-              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              <WhatsAppIcon className="h-4 w-4" aria-hidden="true" />
               WhatsApp
             </a>
             <a

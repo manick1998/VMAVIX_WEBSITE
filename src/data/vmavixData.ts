@@ -523,13 +523,6 @@ export function serviceToGoal(serviceId: string): ProjectGoal | undefined {
   return SERVICE_ID_TO_GOAL[serviceId];
 }
 
-export const BUDGET_RANGES = [
-  'Under $5,000',
-  '$5,000 - $15,000',
-  '$15,000 - $30,000',
-  '$30,000+',
-] as const;
-
 export const TIMELINE_OPTIONS = [
   'ASAP (2-3 Weeks)',
   '1 Month',

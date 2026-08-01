@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  X, Check, ArrowRight, CheckCircle2, Loader2, AlertCircle, MessageCircle, Mail,
-} from "lucide-react";
+import { X, Check, ArrowRight, CheckCircle2, Loader2, AlertCircle, Mail } from "lucide-react";
+import { WhatsAppIcon } from "../ui/WhatsAppIcon";
 import confetti from "canvas-confetti";
 import { soundManager } from "../../utils/audio";
 import { useModalA11y } from "../../hooks/useModalA11y";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import {
-  PROJECT_GOALS, BUDGET_RANGES, TIMELINE_OPTIONS,
+  PROJECT_GOALS, TIMELINE_OPTIONS,
 } from "../../data/vmavixData";
 import {
   buildWhatsAppUrl, EMAIL, PHONE_DISPLAY, type EnquiryPayload,
@@ -35,7 +34,6 @@ export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
   const [errorMsg, setErrorMsg] = useState("");
 
   const [goals, setGoals] = useState<string[]>([]);
-  const [budget, setBudget] = useState<string>(BUDGET_RANGES[1]);
   const [timeline, setTimeline] = useState<string>(TIMELINE_OPTIONS[0]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -64,11 +62,10 @@ export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
       email,
       company,
       scope: goals.join(", ") || "Not specified",
-      budget,
       timeline,
       message,
     }),
-    [name, email, company, goals, budget, timeline, message]
+    [name, email, company, goals, timeline, message]
   );
 
   if (!isOpen) return null;
@@ -117,7 +114,7 @@ export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
   };
 
   const stepTitle =
-    step === 1 ? "What do you need?" : step === 2 ? "Budget & timeline" : "Your details";
+    step === 1 ? "What do you need?" : step === 2 ? "Your timeline" : "Your details";
 
   /* ---------------- shared body ---------------- */
   const Body = (
@@ -143,9 +140,6 @@ export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
               <span className="text-white/40">Scope:</span> {payload.scope}
             </div>
             <div className="text-white/85">
-              <span className="text-white/40">Budget:</span> {budget}
-            </div>
-            <div className="text-white/85">
               <span className="text-white/40">Timeline:</span> {timeline}
             </div>
           </div>
@@ -157,7 +151,7 @@ export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
               rel="noopener noreferrer"
               className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#25D366,#128C7E)] px-7 text-sm font-bold text-white active:scale-[0.97]"
             >
-              <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+              <WhatsAppIcon className="h-[18px] w-[18px]" aria-hidden="true" />
               Re-open WhatsApp
             </a>
             <button
@@ -239,32 +233,6 @@ export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
 
           {step === 2 && (
             <div className="space-y-6">
-              <fieldset>
-                <legend className="mb-3 font-mono text-[10px] font-bold uppercase tracking-wider text-white/55">
-                  Estimated budget
-                </legend>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {BUDGET_RANGES.map((b) => (
-                    <button
-                      key={b}
-                      type="button"
-                      aria-pressed={budget === b}
-                      onClick={() => {
-                        soundManager.playClick();
-                        setBudget(b);
-                      }}
-                      className={`min-h-[52px] rounded-2xl border px-3 text-[13px] font-bold transition-all active:scale-[0.96] ${
-                        budget === b
-                          ? "border-brand-orange bg-gradient-to-r from-brand-orange/22 to-brand-pink/18 text-white"
-                          : "border-white/10 bg-white/[0.04] text-white/65"
-                      }`}
-                    >
-                      {b}
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
-
               <fieldset>
                 <legend className="mb-3 font-mono text-[10px] font-bold uppercase tracking-wider text-white/55">
                   Timeline
@@ -422,7 +390,7 @@ export const ProjectBuilderModal: React.FC<ProjectBuilderModalProps> = ({
                     </>
                   ) : (
                     <>
-                      <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+                      <WhatsAppIcon className="h-[18px] w-[18px]" aria-hidden="true" />
                       Send on WhatsApp
                     </>
                   )}

@@ -1,5 +1,6 @@
 import React from "react";
-import { MessageCircle, Phone, Mail, ArrowUp } from "lucide-react";
+import { Phone, Mail, ArrowUp } from "lucide-react";
+import { WhatsAppIcon } from "../ui/WhatsAppIcon";
 import { NAV_LINKS } from "../../data/vmavixData";
 import { quickWhatsAppUrl, PHONE_E164, EMAIL, PHONE_DISPLAY } from "../../config/contact";
 import { soundManager } from "../../utils/audio";
@@ -48,7 +49,7 @@ export const MobileFooter: React.FC<MobileFooterProps> = ({ onOpenLegalModal }) 
             aria-label="WhatsApp"
             className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#25D366]/25 bg-[#25D366]/12 text-[#25D366] transition-transform active:scale-90"
           >
-            <MessageCircle className="h-5 w-5" aria-hidden="true" />
+            <WhatsAppIcon className="h-5 w-5" aria-hidden="true" />
           </a>
           <a
             href={`tel:${PHONE_E164}`}
