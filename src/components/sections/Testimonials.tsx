@@ -43,7 +43,7 @@ export const Testimonials: React.FC = () => {
             <Quote className="absolute top-6 right-8 w-24 h-24 text-white/5 pointer-events-none" />
 
             <div className="flex items-center gap-1 mb-6">
-              {[...Array(current.rating)].map((_, i) => (
+              {[...Array(current.rating ?? 5)].map((_, i) => (
                 <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
               ))}
             </div>
@@ -71,7 +71,7 @@ export const Testimonials: React.FC = () => {
 
               {/* Metric Tag */}
               <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-orange/10 to-brand-pink/10 border border-brand-orange/30 text-brand-orange font-mono text-xs font-bold">
-                {current.metrics}
+                {current.highlight}
               </div>
             </div>
           </div>

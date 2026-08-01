@@ -45,10 +45,11 @@ export interface Testimonial {
   author: string;
   role: string;
   company: string;
-  companyLogo: string;
   avatar: string;
-  metrics: string;
-  rating: number;
+  /** Headline result, e.g. "+340% Conversion Increase". */
+  highlight: string;
+  /** Defaults to 5 in the UI when omitted. */
+  rating?: number;
   featured?: boolean;
 }
 

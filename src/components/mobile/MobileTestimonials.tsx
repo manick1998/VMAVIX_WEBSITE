@@ -52,12 +52,12 @@ export const MobileTestimonials: React.FC = () => {
               aria-hidden="true"
             />
 
-            <div className="mb-4 flex gap-1" aria-label={`Rated ${t.rating} out of 5`}>
+            <div className="mb-4 flex gap-1" aria-label={`Rated ${t.rating ?? 5} out of 5`}>
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
                   key={i}
                   className={`h-3.5 w-3.5 transition-all duration-500 ${
-                    i < t.rating
+                    i < (t.rating ?? 5)
                       ? "fill-brand-orange text-brand-orange"
                       : "text-white/15"
                   }`}
@@ -73,7 +73,7 @@ export const MobileTestimonials: React.FC = () => {
 
             <div className="mt-5 inline-flex rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5">
               <span className="font-mono text-[10px] font-semibold text-emerald-400">
-                {t.metrics}
+                {t.highlight}
               </span>
             </div>
 
